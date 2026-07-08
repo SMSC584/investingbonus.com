@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investing.com | Premium Bonus Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --inv-orange: #f39c12;
+            --inv-blue: #0b1e33;
+            --inv-light-blue: #163152;
+            --gold-gradient: linear-gradient(135deg, #f39c12 0%, #ffcc00 100%);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle at center, #163152 0%, #050c16 100%);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* ????????????? ??? ? ????????? */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .header-ui {
+            text-align: center;
+            margin-bottom: 30px;
+            z-index: 10;
+        }
+
+        .logo-svg {
+            height: 40px;
+            fill: white;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(243, 156, 18, 0.5));
+        }
+
+        .promo-badge {
+            background: var(--inv-orange);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            font-weight: 200;
+            letter-spacing: -1px;
+        }
+
+        h1 b { font-weight: 900; color: var(--inv-orange); }
+
+        /* ?????? */
+        .wheel-wrapper {
+            position: relative;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 100px rgba(0,0,0,0.5);
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            border: 12px solid #050c16;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(243, 156, 18, 0.2);
+            overflow: hidden;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            transition: transform 7s cubic-bezier(0.2, 0, 0.1, 1);
+        }
+
+        /* ????????? */
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 45px;
+            height: 55px;
+            background: #fff;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 100;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+
+        /* ??????????? ????????????? ?????? */
+        .center-hub {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px; height: 90px;
+            background: #050c16;
+            border: 4px solid var(--inv-orange);
+            border-radius: 50%;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(243, 156, 18, 0.6);
+            transition: 0.3s;
+        }
+
+        .center-hub i {
+            font-size: 35px;
+            color: var(--inv-orange);
+            animation: pulse-gold 2s infinite;
+        }
+
+        @keyframes pulse-gold {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .center-hub:hover { transform: translate(-50%, -50%) scale(1.1); background: var(--inv-orange); }
+        .center-hub:hover i { color: #000; }
+
+        /* ?????? Spin */
+        #spin-btn {
+            margin-top: 40px;
+            background: var(--gold-gradient);
+            border: none;
+            padding: 20px 80px;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.4);
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        #spin-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(243, 156, 18, 0.6); }
+        #spin-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* ????????? ???? ???????? */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 5, 15, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+            padding: 60px;
+            border-radius: 20px;
+            text-align: center;
+            color: #000;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 0 100px rgba(243, 156, 18, 0.4);
+        }
+
+        .modal-content h2 { font-weight: 900; margin-top: 0; color: #163152; }
+        .modal-content .amount { font-size: 5rem; font-weight: 900; color: var(--inv-orange); margin: 20px 0; }
+        .modal-content button {
+            background: #000; color: #fff; padding: 15px 40px; border: none; border-radius: 5px; 
+            font-weight: bold; cursor: pointer; width: 100%; font-size: 1.1rem;
+        }
+
+        .show { display: flex; }
+    </style>
+</head>
+<body>
+
+    <div class="header-ui">
+        <svg class="logo-svg" viewBox="0 0 158 28">
+            <path d="M0 2.9327L5.58456 1.38013V22.4256H0V2.9327ZM22.7678 22.4256H17.6987V14.7491C17.6987 12.8516 17.7847 10.6091 15.2931 10.6091C13.317 10.6091 12.3719 11.9891 12.3719 13.8866V22.3393H7.30288V7.76278L12.2001 6.38277V9.14278C13.1452 7.41775 15.2931 6.469 17.0973 6.469C21.1354 6.469 22.6819 8.7978 22.6819 12.5066L22.7678 22.4256ZM27.5791 22.4256L22.4241 6.90026H27.665L30.5003 17.2505L33.4214 6.90026H38.5764L33.4214 22.4256H27.5791ZM48.8004 12.5066C48.5427 11.1266 47.4258 9.91907 45.8793 9.91907C43.5595 9.91907 42.4426 12.0754 42.5285 14.2317L48.8004 12.5066ZM46.3089 19.493C48.5427 19.493 50.6906 18.458 51.9793 16.733L53.354 20.4418C51.4638 21.9943 48.5427 22.8568 46.0511 22.8568C41.1539 22.8568 37.5454 19.9243 37.5454 14.5767C37.5454 9.83284 41.2398 6.38277 45.8793 6.38277C50.6906 6.38277 53.6977 9.57405 53.6977 14.4904L42.9581 17.5092C43.4736 18.9755 44.8483 19.493 46.3089 19.493ZM63.4921 12.8516C64.6949 13.0242 65.9837 13.2829 66.9288 13.8866C68.1316 14.6629 68.9048 15.9567 68.9048 17.3367C68.9048 21.4768 65.0386 22.8568 61.3442 22.8568C58.0794 22.8568 54.4709 21.7355 53.8695 18.1992L58.2512 16.9917C58.509 18.6305 59.6259 19.6655 61.2583 19.6655C62.3752 19.6655 63.8358 19.148 63.8358 17.9405C63.8358 16.7329 62.2893 16.4742 61.3442 16.2154C60.6569 16.0429 60.0555 15.9567 59.3681 15.7842C56.7906 15.2667 54.2132 14.4904 54.2132 11.1266C54.2132 7.33154 58.2512 6.38277 61.2583 6.38277C64.0935 6.38277 67.8738 7.33152 68.3893 10.3503L63.9217 11.5579C63.6639 10.1778 62.7189 9.66032 61.1724 9.66032C60.3132 9.66032 59.2822 9.91905 59.2822 10.8678C59.2822 11.9028 61.0865 12.3341 61.9456 12.5066C62.4611 12.6791 62.9766 12.7654 63.4921 12.8516ZM74.8331 10.1778V17.2505C74.8331 17.9405 75.0908 18.458 75.6922 18.6305C76.4655 18.8892 77.8401 18.7167 78.5275 18.5442L77.4965 22.4256C76.8091 22.5118 75.8641 22.5981 75.2626 22.5981C70.9668 22.5981 69.8499 21.3043 69.8499 17.078V3.96768L74.919 2.58767V6.90026H78.6134L77.6683 10.1778H74.8331ZM79.1289 7.76278L84.1979 6.38277V22.4256H79.1289V7.76278ZM96.3121 14.7491C96.3121 12.8516 96.398 10.6091 93.9065 10.6091C91.9304 10.6091 90.9853 11.9891 90.9853 13.8866V22.3393H85.9163V7.76278L90.8135 6.38277V9.14278C91.7586 7.41775 93.9065 6.469 95.7107 6.469C99.7488 6.469 101.295 8.7978 101.295 12.5066V22.4256H96.2262L96.3121 14.7491ZM110.574 10.3503C108.34 10.3503 107.653 12.3341 107.653 14.2317C107.653 16.0429 108.512 17.8542 110.574 17.8542C112.722 17.8542 113.667 16.2154 113.667 14.2317C113.581 12.3341 112.808 10.3503 110.574 10.3503ZM110.316 27.9457C107.309 27.9457 104.131 27.1694 103.1 23.8056L107.653 22.5118C107.997 23.8918 109.2 24.6681 110.574 24.6681C112.636 24.6681 113.495 22.9431 113.495 21.0456V19.493C112.55 21.0455 111.004 21.9081 109.285 21.9081C104.56 21.9081 102.498 18.5443 102.498 14.1454C102.498 10.0053 104.904 6.55523 109.285 6.55523C111.09 6.55523 112.55 7.41779 113.495 8.97032V7.84901L118.393 6.469V20.7005C118.393 25.5306 114.784 27.9457 110.316 27.9457ZM120.712 20.3555H122.345V22.4256H120.712V20.3555ZM128.359 21.7356C129.819 21.7356 130.936 20.4418 131.108 18.803L132.311 19.148C131.881 21.3043 130.507 22.7706 128.359 22.7706C125.438 22.7706 123.719 20.2693 123.719 17.3367C123.719 14.4041 125.352 11.9891 128.359 11.9028C130.335 11.9028 131.881 13.0241 132.225 15.0942L131.022 15.4392C130.679 13.9729 129.734 13.0241 128.359 13.0241C126.125 13.0241 125.008 15.2667 125.008 17.3367C124.922 19.493 126.125 21.7356 128.359 21.7356ZM138.153 13.0241C135.92 13.0241 134.803 15.2667 134.803 17.3367C134.803 19.493 135.92 21.6493 138.153 21.6493C140.387 21.6493 141.504 19.4067 141.504 17.3367C141.504 15.1804 140.387 13.0241 138.153 13.0241ZM138.153 22.7706C135.232 22.7706 133.514 20.2693 133.514 17.3367C133.514 14.4041 135.146 11.9028 138.153 11.9028C141.16 11.9028 142.793 14.4041 142.793 17.3367C142.793 20.2693 141.074 22.7706 138.153 22.7706ZM156.797 22.4256V15.5254C156.797 13.8866 156.196 12.9379 154.477 12.9379C152.415 12.9379 151.814 14.8354 151.814 16.6467V22.4256H150.611V15.5254C150.611 14.1454 150.096 13.0241 148.549 13.0241C146.401 13.0241 145.628 14.8354 145.628 16.8192V22.5118H144.425V12.5066L145.542 12.1616V14.1454C146.229 12.6791 147.432 11.9891 148.807 11.9891C150.096 11.9891 151.213 12.6791 151.642 13.9729C152.244 12.6791 153.446 11.9891 154.735 11.9891C156.969 11.9891 158 13.2829 158 15.5254V22.4256H156.797Z" fill="currentColor"></path>
+        </svg>
+        <div class="promo-badge">Limited Time Offer</div>
+        <h1>INVESTING<b>.COM</b> EXCLUSIVE</h1>
+    </div>
+
+    <div class="wheel-wrapper">
+        <div class="pointer"></div>
+        <div class="center-hub" onclick="spinWheel()">
+            <i class="fas fa-gem"></i>
+        </div>
+        <div class="wheel-container">
+            <canvas id="wheel" width="500" height="500"></canvas>
+        </div>
+    </div>
+
+    <button id="spin-btn" onclick="spinWheel()">Spin to Win Bonus</button>
+
+    <div id="win-modal" class="modal">
+        <div class="modal-content">
+            <h2>REWARD UNLOCKED!</h2>
+            <div class="amount" id="win-amount">0 EUR</div>
+            <p>Your exclusive bonus has been successfully reserved in your Investing.com profile.</p>
+            <button onclick="location.reload()">CLAIM MY BONUS</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('spin-btn');
+        const modal = document.getElementById('win-modal');
+        const winAmountText = document.getElementById('win-amount');
+
+        const bonuses = ["50 EUR", "75 EUR", "100 EUR", "125 EUR", "150 EUR", "175 EUR", "200 EUR", "90 EUR"];
+        const colors = ["#0b1e33", "#163152"];
+        const totalSectors = bonuses.length;
+        const arc = (2 * Math.PI) / totalSectors;
+
+        let currentRotation = 0;
+
+        function draw() {
+            for (let i = 0; i < totalSectors; i++) {
+                const angle = i * arc;
+                ctx.fillStyle = colors[i % 2];
+                ctx.beginPath();
+                ctx.moveTo(250, 250);
+                ctx.arc(250, 250, 250, angle, angle + arc);
+                ctx.fill();
+
+                // ????? ??????????
+                ctx.strokeStyle = "rgba(255,255,255,0.1)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(250, 250);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = (i % 2 === 0) ? "#f39c12" : "#ffffff";
+                ctx.font = "bold 22px Arial";
+                ctx.fillText(bonuses[i], 230, 10);
+                ctx.restore();
+            }
+        }
+
+        draw();
+
+        function spinWheel() {
+            if (btn.disabled) return;
+            btn.disabled = true;
+
+            const targetIndex = Math.floor(Math.random() * totalSectors);
+            const targetValue = bonuses[targetIndex];
+            
+            const degreesPerSlice = 360 / totalSectors;
+            const fullSpins = 360 * 10; 
+            
+            const targetRotation = (targetIndex * degreesPerSlice);
+            const landingPoint = 360 - targetRotation - (degreesPerSlice / 2) - 90;
+            
+            currentRotation += fullSpins + (landingPoint - (currentRotation % 360) + 360) % 360;
+
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                winAmountText.innerText = targetValue;
+                modal.classList.add('show');
+                
+                confetti({
+                    particleCount: 200,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#f39c12', '#ffffff', '#163152']
+                });
+            }, 7200);
+        }
+    </script>
+</body>
+</html>
